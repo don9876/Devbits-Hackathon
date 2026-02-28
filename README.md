@@ -6,13 +6,13 @@ Automated phone-based real-estate sales agent built around [Groq](https://groq.c
 
 ```
 .
-├── `main.py`                    # server implementation
-├── `en_US-lessac-high.onnx`     # TTS model (large; not checked in)
-├── `en_US-lessac-high.onnx.json`
+├── main.py                      # server implementation
+├── en_US-lessac-high.onnx       # TTS model (large; not checked in)
+├── en_US-lessac-high.onnx.json  # model metadata
 ├── real_estate_data.json        # company/listings data
-├── `Real_Estate_Call_Logs.txt`  # rolling log of leads
-├── requirements.txt
-└── README.md
+├── Real_Estate_Call_Logs.txt    # rolling log of leads
+├── requirements.txt             # Python dependencies
+└── README.md                    # this file
 ```
 
 ## Prerequisites
@@ -26,8 +26,8 @@ Automated phone-based real-estate sales agent built around [Groq](https://groq.c
 ## Installation
 
 ```bash
-git clone https://github.com/youruser/yourrepo.git
-cd yourrepo
+git clone https://github.com/don9876/Devbits-Hackathon.git
+cd Devbits-Hackathon
 python -m venv venv
 source venv/bin/activate        # or .\venv\Scripts\activate on Windows
 pip install -r requirements.txt
@@ -37,44 +37,30 @@ pip install -r requirements.txt
 
 ```
 torch>=2.0.0            # CPU or GPU build, install nightly if you need CUDA
-faster-whisper>=0.5.0    # ASR frontend
+faster-whisper>=0.5.0   # ASR frontend
 groq>=1.0.0             # Groq LLM client
 numpy
 scipy
 ```
 
-(Add additional pins as necessary.)
-
 ### Piper and model files
 
-The ONNX TTS model is large and therefore not checked in by default
-(see `.gitignore`).  If you choose to commit it to the repo you can
-remove the ignore line; otherwise download it yourself and place it in
-the repo root or update `MODEL_PATH` in `main.py` to wherever you
-store it.
+The ONNX TTS model is large (~200 MB) and therefore not checked in by default (see `.gitignore`). If you choose to commit it to the repo you can remove the ignore line; otherwise download it yourself and place it in the repo root or update `MODEL_PATH` in `main.py` to wherever you store it.
 
-```bash
-# download and put it in the repo root
-wget https://example.com/en_US-lessac-high.onnx
-```
-
-Piper itself is a separate project.  Build from source with `cargo` or
-grab a binary release from the GitHub releases page.  Once installed
-either add it to your `PATH` or set the `PIPER_EXE` constant in
-`main.py` to the full executable path.  The server will spawn Piper to
-produce 8 kHz audio for the CPaaS client.
+Piper itself is a separate project. Build from source with `cargo` or grab a binary release from the [GitHub releases page](https://github.com/rhasspy/piper/releases). Once installed, either add it to your `PATH` or set the `PIPER_EXE` constant in `main.py` to the full executable path. The server will spawn Piper to produce 8 kHz audio for the CPaaS client.
 
 ## Usage
 
-Before starting the server you must set a valid Groq API key.  The
-example below uses a placeholder; substitute your real key.
+Before starting the server you must set a valid Groq API key. The example below uses a placeholder; substitute your real key:
 
 ```bash
 # POSIX style
 export GROQ_API_KEY="sk_your_real_key_here"
-# on Windows PowerShell use setx or env variable UI
-# setx GROQ_API_KEY "sk_your_real_key_here"
-python `main.py`
+
+# On Windows PowerShell use setx or the Environment Variables UI
+setx GROQ_API_KEY "sk_your_real_key_here"
+
+python main.py
 ```
 
 The server listens on `0.0.0.0:9092` and accepts a single call. Lead summaries are appended to `Real_Estate_Call_Logs.txt` automatically.
