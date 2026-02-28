@@ -1,27 +1,62 @@
 # Real-Estate CPaaS
 
-Automated phone-based real-estate sales agent built around [Groq](https://groq.com/), [Whisper](https://github.com/openai/whisper) and [@rhasspy/piper](https://github.com/rhasspy/piper).
+A production-ready automated phone-based real-estate sales agent that leverages cutting-edge AI technologies to handle inbound real-estate inquiries. Built with [Groq](https://groq.com/) for fast LLM inference, [Whisper](https://github.com/openai/whisper) for speech-to-text transcription, and [@rhasspy/piper](https://github.com/rhasspy/piper) for high-quality text-to-speech synthesis.
+
+## Overview
+
+This CPaaS server listens on a dedicated TCP port and handles a single incoming call from a remote CPaaS client. It orchestrates a multi-stage pipeline:
+
+1. **Speech Detection** – Uses Silero VAD (Voice Activity Detection) to identify when the user is speaking
+2. **Transcription** – Converts audio to text using Whisper's distil-medium.en model
+3. **Dialogue Generation** – Sends transcribed text to Groq's Llama 3.3 70B model with a custom real-estate sales prompt
+4. **Text-to-Speech** – Streams responses through Piper for natural-sounding audio synthesis
+5. **Lead Capture** – Records all interactions and generates automated lead summaries
+
+Perfect for real-estate companies looking to automate first-contact sales calls, lead qualification, and property information delivery.
 
 ## Repository layout
 
 ```
 .
-├── main.py                      # server implementation
-├── en_US-lessac-high.onnx       # TTS model (large; not checked in)
-├── en_US-lessac-high.onnx.json  # model metadata
-├── real_estate_data.json        # company/listings data
-├── Real_Estate_Call_Logs.txt    # rolling log of leads
-├── requirements.txt             # Python dependencies
+├── main.py                      # core server implementation with CallHandler
+├── en_US-lessac-high.onnx       # TTS voice model (large; not committed by default)
+├── en_US-lessac-high.onnx.json  # model metadata and configuration
+├── real_estate_data.json        # company info and property listings
+├── Real_Estate_Call_Logs.txt    # automated lead summaries (append-only)
+├── requirements.txt             # Python package dependencies
+├── .gitignore                   # version control exclusions
 └── README.md                    # this file
+```
+
+## Quick Start
+
+```bash
+git clone https://github.com/don9876/Devbits-Hackathon.git
+cd Devbits-Hackathon
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+export GROQ_API_KEY="sk_your_real_key_here"
+export PIPER_EXE="/path/to/piper"
+python main.py
 ```
 
 ## Prerequisites
 
-* Python 3.10+ (3.11 recommended).
-* A working CPaaS client that speaks the simple `MSG_AUDIO_8KHZ` protocol (not included).
-* [piper](https://github.com/rhasspy/piper) binary installed; set `PIPER_EXE` in `main.py` or export the same name as an environment variable (`export PIPER_EXE=/path/to/piper` on POSIX, `setx PIPER_EXE "C:\path\to\piper.exe"` on Windows).  The server will spawn this executable for text-to-speech, so ensure the path is valid or have it on your `PATH`.
-* `GROQ_API_KEY` environment variable (get one from https://groq.com)
-* Network access to download Whisper models (first run).
+### System Requirements
+
+* **Python**: 3.10 or higher (3.11+ recommended for best performance)
+* **Operating System**: Linux, macOS, or Windows (with WSL2 recommended for Windows)
+* **RAM**: Minimum 4GB; 8GB+ recommended for smooth concurrent model operations
+* **Network**: Stable internet connection for initial model downloads (~500MB for Whisper)
+
+### External Dependencies
+
+* **[piper](https://github.com/rhasspy/piper)** – A high-performance TTS engine. Must be installed separately and made available on your `PATH` or configured via the `PIPER_EXE` environment variable.
+  
+* **[GROQ API Key](https://groq.com/)** – Required for LLM inference. Sign up at Groq and generate an API key; set as the `GROQ_API_KEY` environment variable.
+
+* **CPaaS Client** – A compatible SIP/telephony client that speaks the `MSG_AUDIO_8KHZ` protocol (not included in this repo). This is the incoming call interface.
 
 ## Installation
 
