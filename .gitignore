@@ -1,0 +1,15 @@
+# Python artifacts
+venv/
+__pycache__/
+*.pyc
+
+# Model files
+# we now commit the voice model itself, so don't ignore it any longer
+# (if you prefer to keep it out of Git, remove the following line)
+# en_US-lessac-high.onnx
+
+# Whisper cache
+whisper-*
+
+# Other generated data
+*.onnx

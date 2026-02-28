@@ -1,0 +1,69 @@
+{
+  "company_name": "ATS Builders",
+  "address": "Operations HQ, NCR Region",
+  "listings": {
+    "ATS Pristine (Noida)": {
+      "type": "Apartment",
+      "location": "Sector 150, Noida",
+      "config": ["3BHK", "4BHK"],
+      "details": "Premium eco-friendly apartments with a 5-acre central greenery.",
+      "price_range": "1.5Cr - 3.2Cr",
+      "availability": "Ready to move",
+      "amenities": ["Clubhouse", "Swimming Pool", "Skating Rink"]
+    },
+    "ATS Grandstand (Gurgaon)": {
+      "type": "Apartment",
+      "location": "Sector 99A, Gurgaon",
+      "config": ["3BHK"],
+      "details": "Strategically located on Dwarka Expressway for easy Delhi connectivity.",
+      "price_range": "95L - 1.8Cr",
+      "availability": "Under construction",
+      "amenities": ["Sports Complex", "Gym", "High-speed Elevators"]
+    },
+    "ATS Heavenly Villas (Noida)": {
+      "type": "Villa",
+      "location": "Sector 150, Noida",
+      "config": ["5BHK"],
+      "details": "Ultra-luxury villas with private lawns and bespoke interiors.",
+      "price_range": "6Cr - 15Cr",
+      "availability": "Limited Inventory",
+      "amenities": ["Private Pool", "Concierge Service", "Golf Course Access"]
+    },
+    "ATS Green Plots (Gurgaon)": {
+      "type": "Plot",
+      "location": "Sohna Road, Gurgaon",
+      "config": ["150 sq.yd", "250 sq.yd", "500 sq.yd"],
+      "details": "RERA approved residential plots in a lush green gated community.",
+      "price_range": "85L - 3Cr",
+      "availability": "Available",
+      "amenities": ["Power Backup", "24/7 Security", "Jogging Track"]
+    },
+    "ATS Marigold (Gurgaon)": {
+      "type": "Apartment",
+      "location": "Sector 89, Gurgaon",
+      "config": ["3BHK"],
+      "details": "Sacred sanctuary living with high-end finishing and open balconies.",
+      "price_range": "1.2Cr - 2.1Cr",
+      "availability": "Ready to move",
+      "amenities": ["Yoga Deck", "Meditation Center", "Kids Play Area"]
+    },
+    "ATS Rhapsody (Greater Noida)": {
+      "type": "Apartment",
+      "location": "Sector 1, Greater Noida West",
+      "config": ["3BHK", "4BHK"],
+      "details": "Artist-inspired architecture with signature blue and white themes.",
+      "price_range": "80L - 1.5Cr",
+      "availability": "Possession Soon",
+      "amenities": ["Amphitheatre", "Badminton Court", "Community Hall"]
+    },
+    "ATS Nobility (Greater Noida)": {
+      "type": "Apartment",
+      "location": "Sector 4, Greater Noida West",
+      "config": ["3BHK"],
+      "details": "Exclusive single-tower layout for maximum privacy and ventilation.",
+      "price_range": "75L - 1.2Cr",
+      "availability": "Under construction",
+      "amenities": ["Landscape Garden", "Fire Safety", "Intercom"]
+    }
+  }
+}

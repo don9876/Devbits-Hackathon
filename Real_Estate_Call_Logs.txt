@@ -1,0 +1,23 @@
+
+############################################################
+ SALES LEAD RECORD - 2026-02-28 21:00:11
+############################################################
+**Sales Lead Summary**
+
+**Lead Name:** Ashmit
+**Contact Number:** 8248730
+**Location Preference:** Noida
+**Property Type:** 3BHK Apartment
+**Budget:** ₹2 Crore
+**Project of Interest:** ATS Pristine, Noida
+**Amenities of Interest:** Clubhouse, Swimming Pool, Gym
+**Next Steps:** Site visit scheduled for ATS Pristine, Noida
+**Current Status:** Lead has expressed interest in visiting the site, follow-up required to confirm visit details and provide additional information as needed.
+
+**Additional Notes:**
+
+* The lead is looking for a luxurious 3BHK apartment in Noida with a budget of ₹2 Crore.
+* ATS Pristine, with its premium eco-friendly features and high-end amenities, seems to be a good fit for the lead's requirements.
+* A site visit has been requested, and follow-up is required to confirm the visit details and provide additional information to the lead.
+* The lead has shown interest in the project, and a timely follow-up can help convert the lead into a sales opportunity.
+
