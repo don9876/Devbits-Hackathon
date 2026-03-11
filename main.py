@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import socket
 import struct
 import threading
@@ -11,25 +9,14 @@ import os
 import json
 import time
 import re
+import wave # <-- ADDED for audio recording
 from faster_whisper import WhisperModel
 from groq import Groq
 from scipy import signal
 
 # ================= CONFIG =================
-"""API key for Groq LLM access.
-
-The code will read from the `GROQ_API_KEY` environment variable and
-expects you to set one before starting the server.  A hardcoded key is
-dangerous to commit, so we simply use a clear placeholder here.  When
-cloning the repository you should run::
-
-    export GROQ_API_KEY="your_real_key_here"   # POSIX shells
-    setx GROQ_API_KEY "your_real_key_here"     # Windows PowerShell (persist)
-
-and avoid putting the actual secret in source control.
-"""
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "YOUR_GROQ_API_KEY_HERE")
-PIPER_EXE = os.environ.get("PIPER_EXE", "piper")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "YOUR_GROQ_API_KEY_HERE")  # Set your Groq API key in environment variable
+PIPER_EXE = "PIPER_PATH"  # Set this to the path of your Piper executable
 MODEL_PATH = os.path.abspath("./en_US-lessac-high.onnx")
 DATA_FILE = "real_estate_data.json" 
 MOM_LOG_FILE = "Real_Estate_Call_Logs.txt" 
@@ -47,16 +34,11 @@ print(f"[*] CPaaS Engine Active: Using {DEVICE.upper()} acceleration.")
 
 # ================= DATA LOADING =================
 def load_real_estate_data():
-    """Return contents of `DATA_FILE` or a small default dict.
-
-    This is called once at startup; if the file cannot be read a fallback
-    with a generic company name is returned so the server can still run.
-    """
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        print(f"JSON Error loading {DATA_FILE}: {e}")
+        print(f"JSON Error: {e}")
         return {"company_name": "Horizon Estates", "listings": {}, "address": "Global HQ"}
 
 REAL_ESTATE_DATA = load_real_estate_data()
@@ -70,15 +52,35 @@ vad_model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad', model='sile
 vad_model = vad_model.to(DEVICE)
 (get_speech_timestamps, _, _, VADIterator, _) = utils
 
+# ================= SEPARATE AI CALL ANALYZER =================
+class AICallAnalyzer:
+    def __init__(self, api_key):
+        self.client = Groq(api_key=api_key)
+        
+    def analyze_call_and_generate_mom(self, transcript_history, audio_file_path):
+        print(f"\n[*] AICallAnalyzer: Processing call recording '{audio_file_path}'...")
+        if not transcript_history: 
+            print("[-] No conversation to analyze.")
+            return
+            
+        transcript = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in transcript_history])
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+        prompt = f"Generate a professional Sales Lead Summary from this real estate call:\n{transcript}"
+        
+        try:
+            res = self.client.chat.completions.create(
+                model="llama-3.3-70b-versatile", 
+                messages=[{"role": "user", "content": prompt}]
+            )
+            mom_content = res.choices[0].message.content
+            with open(MOM_LOG_FILE, "a", encoding="utf-8") as f:
+                f.write(f"\n{'#'*60}\n SALES LEAD RECORD - {timestamp}\n{'#'*60}\n{mom_content}\n\n")
+            print(f"[*] MoM successfully generated and saved to {MOM_LOG_FILE}.")
+        except Exception as e:
+            print(f"MoM Error in Analyzer: {e}")
+
 # ================= CALL HANDLER =================
 class CallHandler:
-    """Encapsulates state and threads for a single call.
-
-    A `CallHandler` object wraps all of the queues, subprocesses and
-    threads required to receive audio from the CPaaS client, transcribe it,
-    generate an LLM response and send back TTS audio.  It also manages
-    lead summary generation and connection teardown.
-    """
     def __init__(self, conn):
         self.conn = conn
         self.input_queue = queue.Queue()
@@ -90,6 +92,14 @@ class CallHandler:
 
         self.company_info = REAL_ESTATE_DATA
         self.system_prompt = self.build_system_prompt()
+        
+        # Audio Recording Setup
+        self.audio_filename = f"call_recording_{int(time.time())}.wav"
+        self.wav_file = wave.open(self.audio_filename, 'wb')
+        self.wav_file.setnchannels(1)
+        self.wav_file.setsampwidth(2) # 16-bit
+        self.wav_file.setframerate(AST_RATE)
+        self.audio_file_lock = threading.Lock() # Ensure thread-safe audio writes
         
         self.piper_proc = subprocess.Popen(
             [PIPER_EXE, "--model", MODEL_PATH, "--output_file", "-", "--output_raw"],
@@ -110,10 +120,6 @@ class CallHandler:
         
         return f"""You are an intelligent sales agent for {self.company_info['company_name']}. 
 Do not just read a script; understand the user's context.
-
-CORE TERMINATION RULE:
-- If the user says "No", "No thank you", or "Nothing else" when asked if they need more help, you MUST append the tag [HANGUP] at the very end of your final response.
-- Once a site visit is confirmed and you have provided the professional closing, you MUST append [HANGUP].
 
 CORE MEMORY PROTOCOL:
 - Before asking for Name, Number, or Budget, check the conversation history. If provided, DO NOT ask again.
@@ -137,9 +143,8 @@ CURRENT DATASET:
 {listing_str}
 
 CONVERSATIONAL PROTOCOL:
-1. USER PROFILE: First, complete building user profile by the rules stated in "USER PROFILING PROTOCOL" above.
 1. FORMATTING: Speak in plain text ONLY. No markdown. Use professional, welcoming English.
-2. INQUIRY PHASE: Provide property details, pricing, and amenities freely. Do not extend any reply to more than 4 lines. Keep it small and to the point.
+2. INQUIRY PHASE: Provide property details, pricing, and amenities freely.
 3. LEAD TRIGGER: Only start collecting personal data if the user wants to "visit", "view", "book a tour", or "speak to an agent."
 4. DATA COLLECTION (After Trigger):
    - CHECK MEMORY: If Name/Number were provided earlier, do not ask again.
@@ -154,20 +159,6 @@ CONVERSATIONAL PROTOCOL:
 - Only use [HANGUP] if the user explicitly says "No" or "No Thank you" to an assistance request like "Is there anything else I can do for you?", or if a site visit is FULLY confirmed with a date and time, after providing a professional closing.
 - If the user's input is unclear (like "See" or "Okay"), do NOT hang up. Ask for clarification or ask: "Is there anything else I can assist you with regarding our departments, timings, or fees?"
 """
-
-    def generate_mom(self):
-        print(f"\n[*] Appending Lead Summary to {MOM_LOG_FILE}...")
-        if not self.chat_history: return
-        transcript = "\n".join([f"{m['role'].upper()}: {m['content']}" for m in self.chat_history])
-        timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-        prompt = f"Generate a professional Sales Lead Summary from this real estate call:\n{transcript}"
-        try:
-            res = groq_client.chat.completions.create(model="llama-3.3-70b-versatile", messages=[{"role": "user", "content": prompt}])
-            mom_content = res.choices[0].message.content
-            with open(MOM_LOG_FILE, "a", encoding="utf-8") as f:
-                f.write(f"\n{'#'*60}\n SALES LEAD RECORD - {timestamp}\n{'#'*60}\n{mom_content}\n\n")
-        except Exception as e:
-            print(f"MoM Error: {e}")
 
     def initial_greeting(self):
         time.sleep(0.5)
@@ -186,28 +177,19 @@ CONVERSATIONAL PROTOCOL:
             try:
                 text = self.tts_queue.get(timeout=0.1)
                 if text:
-                    # Check for hangup tag
-                    is_final_msg = "[HANGUP]" in text.upper()
-                    clean_text = text.replace("[HANGUP]", "").replace("[hangup]", "").strip()
-                    
-                    if clean_text:
-                        try:
-                            self.piper_proc.stdin.write((clean_text + "\n").encode("utf-8"))
-                            self.piper_proc.stdin.flush()
-                        except (BrokenPipeError, OSError): pass
-                    
-                    self.tts_queue.task_done()
-
-                    # If this was the hangup message, trigger termination AFTER processing
-                    if is_final_msg:
+                    if text.strip().upper() == "[HANGUP]":
+                        self.tts_queue.task_done()
                         self.trigger_hangup()
                         break 
+                    else:
+                        clean_text = self.sanitize_for_tts(text)
+                        if clean_text:
+                            try:
+                                self.piper_proc.stdin.write((clean_text + "\n").encode("utf-8"))
+                                self.piper_proc.stdin.flush()
+                            except (BrokenPipeError, OSError): pass
+                self.tts_queue.task_done()
             except queue.Empty: continue
-
-    # NOTE: a second trigger_hangup definition appears later; the later one
-    # is more complete, so the earlier version above is left here purely for
-    # historical context and will not be called.  The duplicate has been
-    # removed in the next patch segment.
 
     def piper_stdout_reader(self):
         leftover_bytes = b''
@@ -236,24 +218,12 @@ CONVERSATIONAL PROTOCOL:
             except: break
 
     def trigger_hangup(self):
-        """Gracefully terminate the call.
-
-        This method ensures all pending TTS audio is generated and sent
-        before closing the socket and killing the piper subprocess.
-        It may be invoked when the dialogue contains a `[HANGUP]` tag or
-        when the remote side disconnects.
-        """
-        # 1. Wait for TTS queue to be processed by tts_worker
         self.tts_queue.join()
-
-        # 2. Wait for audio output queue to be fully sent by sender thread
         print("[*] Draining audio buffers for graceful exit...")
         while not self.output_queue.empty() and not self.stop_event.is_set():
             time.sleep(0.1)
-
-        # 3. Final safety buffer to ensure last chunk plays on client side
         time.sleep(1.0)
-
+        
         print("[!] AI hanging up.")
         self.stop_event.set()
         try:
@@ -266,6 +236,9 @@ CONVERSATIONAL PROTOCOL:
         self.stop_event.set()
         try: self.piper_proc.terminate()
         except: pass
+        try: 
+            self.wav_file.close() # Close audio recording file
+        except: pass
         try: self.conn.shutdown(socket.SHUT_RDWR); self.conn.close()
         except: pass
 
@@ -275,6 +248,11 @@ CONVERSATIONAL PROTOCOL:
                 try:
                     payload = self.output_queue.get(timeout=0.1)
                     self.conn.sendall(struct.pack(">BH", MSG_AUDIO_8KHZ, len(payload)) + payload)
+                    
+                    # Record AI Audio
+                    with self.audio_file_lock:
+                        self.wav_file.writeframes(payload)
+                        
                     time.sleep(0.019) 
                 except queue.Empty: continue
         finally: self.cleanup()
@@ -292,6 +270,11 @@ CONVERSATIONAL PROTOCOL:
                     payload += chunk
                 if msg_type == MSG_AUDIO_8KHZ and not self.is_ai_talking:
                     self.input_queue.put(payload)
+                    
+                    # Record User Audio
+                    with self.audio_file_lock:
+                        self.wav_file.writeframes(payload)
+                        
         finally: self.cleanup()
 
     def processor(self):
@@ -366,7 +349,7 @@ CONVERSATIONAL PROTOCOL:
                                 self.is_ai_talking = False
                             
                             audio_history = [] 
-                            vad_iter.reset_states()   
+                            vad_iter.reset()   
                     else:
                         if is_user_speaking:
                             audio_history.append(current)
@@ -384,8 +367,14 @@ def start_server():
     try:
         conn, addr = server.accept()
         handler = CallHandler(conn)
-        while not handler.stop_event.is_set(): time.sleep(0.5)
-        handler.generate_mom()
+        
+        while not handler.stop_event.is_set(): 
+            time.sleep(0.5)
+            
+        # Call the new standalone analyzer once the handler terminates
+        analyzer = AICallAnalyzer(api_key=GROQ_API_KEY)
+        analyzer.analyze_call_and_generate_mom(handler.chat_history, handler.audio_filename)
+        
     except KeyboardInterrupt: pass
     finally: server.close()
 
