@@ -1,0 +1,11 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity**: Manoj Kumar Sharma
+* **Requirement**: Refund Status Update
+* **Budget**: Not Mentioned
+* **Next Steps**: 
+  1. The customer service representative will check the refund status in the system.
+  2. The representative will call the customer back within 10 minutes to update them on the status.
+  3. If the issue is not resolved, the customer may be provided with the manager's number to escalate the concern.
+
+Note: The conversation primarily revolves around a refund request and its status, with no discussion on new requirements or budget. The next steps are focused on resolving the customer's existing concern.

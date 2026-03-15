@@ -1,0 +1,9 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity**: Not Mentioned
+* **Requirement**: Repair of cooling coil
+* **Budget**: ₹9,300 (mentioned by the customer), ₹9,800 (initially entered)
+* **Next Steps**:
+	+ The technician is scheduled to visit the customer either today or tomorrow to repair the cooling coil.
+	+ The customer's account will be updated with the correct payment amount (₹9,300) once confirmed.
+	+ The issue with the product is being addressed, and the company is returning the product due to a damaged cooling coil.

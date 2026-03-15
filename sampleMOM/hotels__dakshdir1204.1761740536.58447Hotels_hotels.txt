@@ -1,0 +1,18 @@
+**Minutes of Meeting (MOM)**
+
+**Customer Identity:** Not Mentioned
+
+**Requirement:**
+- Number of people: 12
+- Number of rooms: 4
+- Duration of stay: 2 nights (Friday and Saturday)
+- Preferred resort: Daksh Resort and Amusement Park
+
+**Budget:**
+- Price per room for double occupancy: 6000 rupees
+- Extra person charge: 1800 rupees
+- Total for triple occupancy: approximately 7800 rupees per room
+
+**Next Steps:**
+- The customer will confirm the booking by the next day.
+- The representative will wait for the customer's confirmation before proceeding with the booking.

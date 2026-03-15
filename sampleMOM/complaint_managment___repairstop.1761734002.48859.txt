@@ -1,0 +1,9 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity:** Mujib Mujib Mehboob Sheikh
+* **Requirement:** The customer has a complaint about the AC (Air Conditioner)
+* **Budget:** Not Mentioned
+* **Next Steps:** 
+  1. The customer care representative will send the customer's details on WhatsApp.
+  2. A technician will visit the customer to address the AC complaint.
+  3. The customer care representative will provide an update to the customer and follow up on the issue.

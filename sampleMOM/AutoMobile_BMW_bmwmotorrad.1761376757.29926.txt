@@ -1,0 +1,9 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity**: Mr. Anirudh Bhai (owner of BMW 210R with car number WB 20 BN 0022)
+* **Requirement**: Car servicing for his BMW 210R
+* **Budget**: Not Mentioned
+* **Next Steps**: 
+    1. Mr. Anirudh Bhai will arrive at the service center around 4-5 pm today.
+    2. He will leave his car at the service center for servicing.
+    3. The service center will keep the car ready for servicing and will be open until 6:30 pm.

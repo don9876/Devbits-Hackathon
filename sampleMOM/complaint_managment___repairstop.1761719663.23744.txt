@@ -1,0 +1,12 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity:** Malika
+* **Requirement:** Repair of a fridge
+* **Budget:** ₹800 (service charge)
+* **Next Steps:** 
+  1. An engineer will be sent to the customer's place immediately.
+  2. The engineer will call before leaving for the customer's location.
+  3. The customer has agreed to the service charge of ₹800, which includes the visit and initial check-up.
+  4. Any additional repair costs will be discussed and agreed upon after the initial assessment by the engineer. 
+
+Note: The provided transcript appears to be related to a customer service call for a fridge repair, rather than a real estate transaction. However, the above MOM is based on the provided transcript, extracting the relevant customer information and next steps.

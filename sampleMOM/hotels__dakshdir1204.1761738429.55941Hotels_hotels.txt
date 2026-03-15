@@ -1,0 +1,13 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity**: Not Mentioned
+* **Requirement**: 
+  - Room type: Family Room
+  - Number of adults: 2
+  - Number of children: 2
+  - Check-in and check-out date: Today (for one night)
+* **Budget**: ₹5000 (negotiated rate), initially ₹5500 (original rate) and ₹2200 (online platform rate)
+* **Next Steps**: 
+  - The customer can book the family room online at the rate of ₹5000.
+  - The hotel staff will provide the room as agreed upon.
+  - The customer is considering booking the room, but no final decision is made in the transcript, with a mention of "tomorrow" which may indicate a potential delay in the decision or booking process.

@@ -1,0 +1,10 @@
+**Minutes of Meeting (MOM)**
+
+* **Customer Identity:** Not Mentioned
+* **Requirement:** First service check for car (initial checkup at 1000 kilometers), car has run around 1300 kilometers
+* **Budget:** Not Mentioned
+* **Next Steps:**
+	1. Customer to visit the service center tomorrow as today's schedule is fully booked.
+	2. Service center will call the customer tomorrow morning to confirm the visit and discuss further details.
+	3. Pickup and drop services can be arranged if required.
+	4. Customer will be informed about the service details and timings once the service center calls tomorrow.
